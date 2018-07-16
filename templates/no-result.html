@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+<h4>{{ name }}</h4>
+<div class="alert alert-danger" role="alert">
+  エラー
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">ユーザIDが正しくないかも（{{ name }}）</li>
+  <li class="list-group-item">対象ユーザに鍵が掛かってるかも</li>
+  <li class="list-group-item">対象ユーザのツイートが少ないかも</li>
+</ul>
+{% endblock %}

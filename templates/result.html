@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+<h3>{{ name }}</h3>
+<canvas id="chart"></canvas>
+<script>
+let pieData = {
+  labels: [
+    {% for label in labels %}
+    "{{ label }}",
+    {% endfor %}
+  ],
+  datasets: [{
+    backgroundColor: [
+      {% for color in colors %}
+      "{{ color }}",
+      {% endfor %}
+    ],
+    data: [
+      {% for value in values %}
+      {{ value }},
+      {% endfor %}
+    ]
+  }]
+}
+let mychart = document.getElementById("chart")
+let chart = new Chart(mychart, {
+  type: 'pie',
+  data: pieData
+})
+
+</script>
+{% endblock %}

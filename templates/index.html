@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="alert alert-info" role="alert">
+  このアプリケーションは、入力されたTwitterのユーザIDを元に、そのユーザがツイートの中で多く使っている単語を抽出します！
+</div>
+<div class="alert alert-danger" role="alert">
+  鍵アカは抽出できないので悪しからず！
+</div>
+<form action="result" method="POST">
+  <div class="form-group">
+   <input name="name" class="form-control" placeholder="@から始まるユーザIDを入力"></input>
+ </div>
+
+
+ <!-- <div>
+   <label for="twNum">取得するツイート数</label>
+   <input num="num" id="twNum">
+ </div> -->
+ <button type="submit" class="btn btn-outline-primary btn-lg">抽出開始</button>
+</form>
+{% endblock %}
