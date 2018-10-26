@@ -6,7 +6,7 @@
 * Token Actions の Create my access token を押下．
   * Access Token，Access Token Secret をそれぞれ`config.py`にコピペする．
 * ターミナルから`pip install -r requirements.tx`で各種ライブラリをインストール．
-***
+
 ## usage
 
 1. ターミナルから`python app.py`で起動．
