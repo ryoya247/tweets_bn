@@ -18,7 +18,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/result', methods=['POST'])
-def hello():
+def show_result():
     if request.method == 'POST':
         name = request.form['name']
     else:
@@ -42,21 +42,20 @@ def hello():
     res = twitter.get(url, params = params)
     timelines = json.loads(res.text)
 
-    if res.status_code == 200:
-        # res = twitter.get(url, params = params)
-        # timelines = json.loads(res.text)
+    print('取得ツイートの最後のid', timelines[-1]['id'])
 
-        for i in range(11):
-            maxid = timelines[-1]['id']
-            params = {
-                'count': 200,
-                'screen_name': name,
-                'max_id': maxid,
-                'exclude_replies': True,
-                'include_rts': False
-            }
-            res = twitter.get(url, params = params)
-            timelines = timelines + json.loads(res.text)
+    # if res.status_code == 200:
+    #     for i in range(11):
+    #         maxid = timelines[-1]['id']
+    #         params = {
+    #             'count': 200,
+    #             'screen_name': name,
+    #             'max_id': maxid,
+    #             'exclude_replies': True,
+    #             'include_rts': False
+    #         }
+    #         res = twitter.get(url, params = params)
+    #         timelines = timelines + json.loads(res.text)
 
     if res.status_code == 200:
         for line in timelines:
