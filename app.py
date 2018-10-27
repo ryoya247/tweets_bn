@@ -1,17 +1,8 @@
 from flask import Flask, render_template, request
-import json, config
-from requests_oauthlib import OAuth1Session
 from janome.tokenizer import Tokenizer
+from getTweets import get_tweets
 
 app = Flask(__name__)
-
-CK = config.CONSUMER_KEY
-CS = config.CONSUMER_SECRET
-AT = config.ACCESS_TOKEN
-ATS = config.ACCESS_TOKEN_SECRET
-twitter = OAuth1Session(CK, CS, AT, ATS)
-
-url = "https://api.twitter.com/1.1/statuses/user_timeline.json"
 
 @app.route('/')
 def index():
@@ -19,45 +10,23 @@ def index():
 
 @app.route('/result', methods=['POST'])
 def show_result():
+    word_dic = {}
+    tweets = []
+    labels = []
+    values = []
+    timelines = []
+    colors = ["#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA","#ABCDEF", "#DDDDDD"]
+
+    t = Tokenizer()
+
     if request.method == 'POST':
         name = request.form['name']
     else:
         name = 'no name'
 
-    params = {
-        'count': 200,
-        'screen_name': name,
-        'exclude_replies': True,
-        'include_rts': False
-    }
+    timelines = get_tweets(name)
 
-    t = Tokenizer()
-    word_dic = {}
-    tweets = []
-    timelines = []
-    labels = []
-    values = []
-    colors = ["#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA","#ABCDEF", "#DDDDDD"]
-
-    res = twitter.get(url, params = params)
-    timelines = json.loads(res.text)
-
-    print('取得ツイートの最後のid', timelines[-1]['id'])
-
-    # if res.status_code == 200:
-    #     for i in range(11):
-    #         maxid = timelines[-1]['id']
-    #         params = {
-    #             'count': 200,
-    #             'screen_name': name,
-    #             'max_id': maxid,
-    #             'exclude_replies': True,
-    #             'include_rts': False
-    #         }
-    #         res = twitter.get(url, params = params)
-    #         timelines = timelines + json.loads(res.text)
-
-    if res.status_code == 200:
+    if timelines:
         for line in timelines:
             text = line['text']
             if text.find('http') == -1:
@@ -77,7 +46,8 @@ def show_result():
             values.append(cnt)
             tweets.append('{0}({1})'.format(word,cnt))
     else:
-        print("Failed: %d" % res.status_code)
+        return render_template('no-result.html', title="no-result", name=name)
+
     if len(labels) < 6:
         return render_template('no-result.html', title="no-result", name=name)
     else:
