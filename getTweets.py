@@ -27,7 +27,7 @@ def get_tweets(screen_name):
         print('最初のリクエスト', max_id)
         timelines = json.loads(res.text)
         max_id = timelines[-1]['id']
-        for i in range(9):
+        for i in range(16):
             print('%d番目のリクエスト' % i, max_id)
             params = {
                 'count': 200,
