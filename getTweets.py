@@ -24,7 +24,6 @@ def get_tweets(screen_name):
     res = twitter.get(url, params=params)
 
     if res.status_code == 200:
-        print('最初のリクエスト', max_id)
         timelines = json.loads(res.text)
         max_id = timelines[-1]['id']
         for i in range(16):

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from janome.tokenizer import Tokenizer
+from gensim.models import word2vec
 from getTweets import get_tweets
 import pprint, math
 
@@ -22,6 +23,9 @@ def show_result():
     timelines = []
     colors = ["#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA","#ABCDEF", "#DDDDDD"]
 
+    r = []
+    results = []
+
     t = Tokenizer()
 
     if request.method == 'POST':
@@ -35,23 +39,49 @@ def show_result():
         for line in timelines:
             # tweet一つ一つ
             text = line['text']
+
+            # httpが含まれてないtweetを対象とする
             if text.find('http') == -1:
+                # 文を平たくする
                 if text.find('\n'):
                     text = text.replace('\n','')
+                # idf値算出用に対象tweetを配列に格納する
                 all_tweets_list.append(text)
 
-                malist = t.tokenize(text)
-
-                for w in malist:
-                    word = w.surface
-                    ps = w.part_of_speech
+                # janomeで形態素解析
+                tokens = t.tokenize(text)
+                r = []
+                for token in tokens:
+                    # 単語の基本形を採用する
+                    if token.base_form == '*':
+                        w = token.surface
+                    else:
+                        w = token.base_form
+                    ps = token.part_of_speech
                     hinsi = ps.split(',')[0]
-                    if hinsi != '形容詞':
+                    if hinsi in ['名詞', '動詞', '形容詞']:
+                        r.append(w)
+
+                    # 名詞以外は弾く
+                    if hinsi != '名詞':
                         continue
 
-                    if not word in word_dic:
-                        word_dic[word] = 1
-                    word_dic[word] += 1
+                    # 単語辞書になかったら追加
+                    if not w in word_dic:
+                        word_dic[w] = 1
+                    word_dic[w] += 1
+                rl = (' '.join(r)).strip()
+                results.append(rl)
+                print(rl)
+
+        wakati_file = 'tweet_wakati.txt'
+        with open(wakati_file, 'w', encoding='utf-8') as fp:
+            fp.write('\n'.join(results))
+
+        data = word2vec.LineSentence(wakati_file)
+        model = word2vec.Word2Vec(data, size = 200, window = 10, hs = 1, min_count = 2, sg = 1)
+        model.save('tweet.model')
+        # 全単語（名詞）の出現回数の合計
         all_words_count = sum(word_dic.values())
 
         # tf値の算出
@@ -73,7 +103,6 @@ def show_result():
 
         keys = sorted(result_dic.items(), key=lambda x:x[1], reverse=True)
 
-        pprint.pprint(keys)
         print('all_words_count',all_words_count)
         print('all_tweets_num',len(all_tweets_list))
 
