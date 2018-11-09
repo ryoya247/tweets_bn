@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from janome.tokenizer import Tokenizer
 from gensim.models import word2vec
 from getTweets import get_tweets
+from getStopWord import create_stopwords
 import pprint, math
 
 app = Flask(__name__)
@@ -28,6 +29,9 @@ def show_result():
 
     t = Tokenizer()
 
+    path = "stop_words.txt"
+    stop_words = create_stopwords(path)
+
     if request.method == 'POST':
         name = request.form['name']
         timelines = get_tweets(name)
@@ -41,7 +45,7 @@ def show_result():
             text = line['text']
 
             # httpが含まれてないtweetを対象とする
-            if text.find('http') == -1:
+            if not 'http' in text:
                 # 文を平たくする
                 if text.find('\n'):
                     text = text.replace('\n','')
@@ -60,10 +64,11 @@ def show_result():
                     ps = token.part_of_speech
                     hinsi = ps.split(',')[0]
                     if hinsi in ['名詞', '動詞', '形容詞']:
-                        r.append(w)
+                        if not w in stop_words:
+                            r.append(w)
 
                     # 名詞以外は弾く
-                    if hinsi != '名詞':
+                    if hinsi != '名詞' or w in stop_words or len(w) == 1:
                         continue
 
                     # 単語辞書になかったら追加
@@ -74,13 +79,14 @@ def show_result():
                 results.append(rl)
                 print(rl)
 
-        wakati_file = 'tweet_wakati.txt'
-        with open(wakati_file, 'w', encoding='utf-8') as fp:
-            fp.write('\n'.join(results))
+        # wakati_file = 'tweet_wakati.txt'
+        # with open(wakati_file, 'w', encoding='utf-8') as fp:
+        #     fp.write('\n'.join(results))
+        #
+        # data = word2vec.LineSentence(wakati_file)
+        # model = word2vec.Word2Vec(data, size = 200, window = 10, hs = 1, min_count = 2, sg = 1)
+        # model.save('tweet.model')
 
-        data = word2vec.LineSentence(wakati_file)
-        model = word2vec.Word2Vec(data, size = 200, window = 10, hs = 1, min_count = 2, sg = 1)
-        model.save('tweet.model')
         # 全単語（名詞）の出現回数の合計
         all_words_count = sum(word_dic.values())
 
@@ -101,7 +107,7 @@ def show_result():
         for wd, ary in tfidf_word_dic.items():
             result_dic[wd] = ary[0] * ary[1]
 
-        keys = sorted(result_dic.items(), key=lambda x:x[1], reverse=True)
+        keys = sorted(word_dic.items(), key=lambda x:x[1], reverse=True)
 
         print('all_words_count',all_words_count)
         print('all_tweets_num',len(all_tweets_list))
