@@ -5,7 +5,7 @@
 * Consumer Key, Consumer Secretをそれぞれ`config.py`にコピペする．
 * Token Actions の Create my access token を押下．
   * Access Token，Access Token Secret をそれぞれ`config.py`にコピペする．
-* ターミナルから`pip install -r requirements.tx`で各種ライブラリをインストール．
+* ターミナルから`pip install -r requirements.txt`で各種ライブラリをインストール．
 
 ## usage
 
