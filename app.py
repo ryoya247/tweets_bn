@@ -87,30 +87,32 @@ def show_result():
         # model = word2vec.Word2Vec(data, size = 200, window = 10, hs = 1, min_count = 2, sg = 1)
         # model.save('tweet.model')
 
-        # 全単語（名詞）の出現回数の合計
-        all_words_count = sum(word_dic.values())
-
-        # tf値の算出
-        for wd,cnt in word_dic.items():
-            tf = int(cnt) / all_words_count
-            tfidf_word_dic[wd] = [tf]
-
-        # idf値の算出
-        for wd in word_dic.keys():
-            df = 0
-            for tweet in all_tweets_list:
-                if tweet.find(wd) > -1:
-                    df += 1
-            tfidf_word_dic[wd].append(math.log(len(all_tweets_list) / df) + 1)
-
-        # tf-idf値の算出
-        for wd, ary in tfidf_word_dic.items():
-            result_dic[wd] = ary[0] * ary[1]
-
+        # # 全単語（名詞）の出現回数の合計
+        # all_words_count = sum(word_dic.values())
+        #
+        # # tf値の算出
+        # for wd,cnt in word_dic.items():
+        #     tf = int(cnt) / all_words_count
+        #     tfidf_word_dic[wd] = [tf]
+        #
+        # # idf値の算出
+        # for wd in word_dic.keys():
+        #     df = 0
+        #     for tweet in all_tweets_list:
+        #         if tweet.find(wd) > -1:
+        #             df += 1
+        #     tfidf_word_dic[wd].append(math.log(1 / df) + 1)
+        #
+        # # tf-idf値の算出
+        # for wd, ary in tfidf_word_dic.items():
+        #     result_dic[wd] = ary[0] * ary[1]
+        #
+        # pprint.pprint(result_dic)
+        #
         keys = sorted(word_dic.items(), key=lambda x:x[1], reverse=True)
-
-        print('all_words_count',all_words_count)
-        print('all_tweets_num',len(all_tweets_list))
+        #
+        # print('all_words_count',all_words_count)
+        # print('all_tweets_num',len(all_tweets_list))
 
         for word,cnt in keys[:6]:
             labels.append(word)
