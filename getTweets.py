@@ -36,7 +36,7 @@ def get_tweets(screen_name):
                 'include_rts': False
             }
             nres = twitter.get(url, params=params)
-            
+
             if nres.status_code == 200:
                 append_timelines = json.loads(nres.text)
                 new_max_id = append_timelines[-1]['id']
