@@ -1,5 +1,3 @@
-import os
-import urllib.request
 
 def create_stopwords(path):
     stop_words = []

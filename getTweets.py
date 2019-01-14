@@ -1,10 +1,11 @@
-import json, config
+import json, os
 from requests_oauthlib import OAuth1Session
 
-CK = config.CONSUMER_KEY
-CS = config.CONSUMER_SECRET
-AT = config.ACCESS_TOKEN
-ATS = config.ACCESS_TOKEN_SECRET
+CK = os.environ['CONSUMER_KEY']
+CS = os.environ['CONSUMER_SECRET']
+AT = os.environ['ACCESS_TOKEN']
+ATS = os.environ['ACCESS_TOKEN_SECRET']
+
 twitter = OAuth1Session(CK, CS, AT, ATS)
 
 url = "https://api.twitter.com/1.1/statuses/user_timeline.json"
@@ -27,7 +28,6 @@ def get_tweets(screen_name):
         timelines = json.loads(res.text)
         max_id = timelines[-1]['id']
         for i in range(16):
-            print('%d番目のリクエスト' % i, max_id)
             params = {
                 'count': 200,
                 'screen_name': screen_name,
@@ -35,16 +35,19 @@ def get_tweets(screen_name):
                 'exclude_replies': True,
                 'include_rts': False
             }
-            res = twitter.get(url, params=params)
-            append_timelines = json.loads(res.text)
-            new_max_id = append_timelines[-1]['id']
+            nres = twitter.get(url, params=params)
+            
+            if nres.status_code == 200:
+                append_timelines = json.loads(nres.text)
+                new_max_id = append_timelines[-1]['id']
 
-            if max_id != new_max_id:
-                timelines = timelines + append_timelines
-                max_id = new_max_id
+                if max_id != new_max_id:
+                    timelines = timelines + append_timelines
+                    max_id = new_max_id
+                else:
+                    break
             else:
                 break
-        print('取得ツイート数', len(timelines))
         return timelines
     else:
         return False
