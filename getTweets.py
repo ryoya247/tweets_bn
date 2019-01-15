@@ -25,9 +25,10 @@ def get_tweets(screen_name):
     res = twitter.get(url, params=params)
 
     if res.status_code == 200:
+        print('status_code：', res.status_code)
         timelines = json.loads(res.text)
         max_id = timelines[-1]['id']
-        for i in range(16):
+        for i in range(8):
             params = {
                 'count': 200,
                 'screen_name': screen_name,
@@ -48,6 +49,8 @@ def get_tweets(screen_name):
                     break
             else:
                 break
+
         return timelines
     else:
+        print('status_code：', res.status_code)
         return False
